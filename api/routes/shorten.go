@@ -48,7 +48,7 @@ func ShortenURL(c * fiber.Ctx) error{
 	} else {
 		valueInt, _ = strconv.Atoi(value)
 
-		if valueInt < = 0 {
+		if valueInt <= 0 {
 			limit, _ := r2.TTL(database.Ctx, c.IP()).Result()
 			return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
 				"error": "Rate limit exceeded",
@@ -86,7 +86,7 @@ func ShortenURL(c * fiber.Ctx) error{
 	var id string
 
 	if body.CustomShort == "" {
-		id = uuid.New()String()[:6]
+		id = uuid.New().String()[:6]
 	} else {
 		id = body.CustomShort
 	}
