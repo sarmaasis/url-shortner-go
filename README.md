@@ -1,4 +1,4 @@
-# url-shortner-go
+# url-shortener-go
 Demonstration of URL shortner with API Rate Limiter and Custom URL using Redis.
 
 
