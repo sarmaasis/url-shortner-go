@@ -29,6 +29,6 @@ func main(){
 
 	setupRoutes(app)
 
-	log.Fatel(app.Listen(os.Getenv("APP_PORT")))
+	log.Fatal(app.Listen(os.Getenv("APP_PORT")))
 
 }
