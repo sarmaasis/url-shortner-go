@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"time"
@@ -43,6 +44,9 @@ func ShortenURL(c *fiber.Ctx) error {
 	defer r2.Close()
 
 	value, err := r2.Get(database.Ctx, c.IP()).Result()
+
+	fmt.Println("value", value)
+	fmt.Println("err", err)
 	if err == redis.Nil {
 		_ = r2.Set(database.Ctx, c.IP(), os.Getenv("API_QUOTA"), 30*60*time.Second).Err()
 	} else {
@@ -50,6 +54,7 @@ func ShortenURL(c *fiber.Ctx) error {
 
 		if valueInt <= 0 {
 			limit, _ := r2.TTL(database.Ctx, c.IP()).Result()
+			fmt.Println("limit", limit)
 			return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
 				"error":            "Rate limit exceeded",
 				"rate_limit_reset": limit / time.Nanosecond / time.Minute,

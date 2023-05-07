@@ -1,21 +1,22 @@
 package main
 
-import(
+import (
 	"fmt"
 	"log"
 	"os"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/joho/godotenv"
 	"github.com/sarmaasis/url-shortner-go/routes"
 )
 
-func setupRoutes(app *fiber.App){
+func setupRoutes(app *fiber.App) {
 	app.Get("/:url", routes.ResolveURL)
 	app.Post("/api/v1", routes.ShortenURL)
 }
 
-func main(){
+func main() {
 
 	err := godotenv.Load()
 
