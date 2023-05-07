@@ -23,7 +23,8 @@ Demonstration of URL shortner with API Rate Limiter and Custom URL using Redis.
    ```sh
    git clone https://github.com/sarmaasis/url-shortner-go
    ```
-2.```sh
+2. Change Directory
+   ```sh
    cd ur-shortner-go
    ```
 3. 
