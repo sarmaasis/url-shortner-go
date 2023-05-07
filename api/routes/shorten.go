@@ -2,8 +2,10 @@ package routes
 
 import(
 	"time"
+	"os"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/sarmaasis/url-shortner-go/database"
 )
 
 type request struct {
@@ -32,6 +34,24 @@ func ShortenURL(c * fiber.Ctx) error{
 		Rate limiting
 	*/
 
+	r2 := database.CreateClient(1)
+	defer r2.Close()
+
+	value, err := r2.Get(database.Ctx, c.IP()).Result()
+	if err == redis.Nil{
+		_ = r2.Set(database.Ctx, c.IP, os.Getenv("API_QUOTA"), 30*60*time.Second).Err()
+	} else {
+		value, _ := r2.Get(database.Ctx, c.IP()).Result()
+		valueInt, _ = strconv.Atoi(value)
+
+		if valueInt < = 0 {
+			limit, _ := r2.TTL(database.Ctx, c.IP()).Result()
+			return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
+				"error": "Rate limit exceeded",
+				"rate_limit_reset": limit/time.Nanosecond/time.Minute,
+			})
+		}
+	}
 
 
 	/*
@@ -58,5 +78,7 @@ func ShortenURL(c * fiber.Ctx) error{
 	*/
 
 	body.URL = helpers.EnforceHTTP(bodu.URL)
+
+	r2.Decr(database.Ctx, c.IP())
 	
 }
