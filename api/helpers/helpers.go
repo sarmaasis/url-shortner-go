@@ -7,7 +7,7 @@ import(
 
 func EnforceHTTP(url string) string {
 
-	if url[:4] != "https" {
+	if url[:5] != "https" {
 		return "https://" + url
 	}
 
