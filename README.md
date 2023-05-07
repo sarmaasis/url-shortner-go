@@ -12,6 +12,9 @@ Demonstration of URL shortner with API Rate Limiter and Custom URL using Redis.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+<!-- GETTING STARTED -->
+## Getting Started
+
 ### Prerequisites
 
 * Go
