@@ -9,8 +9,10 @@ services:
       - redisdb
 
   redisdb:
-    build: db
+    image: redis:latest
     ports:
       - "6379:6379"
+    container_name: redisdb-container
+    command: ["redis-server", "--bind", "redisdb", "--port", "6379"]
     volumes:
       - ./data:/data
