@@ -5,17 +5,17 @@ Demonstration of URL shortner with API Rate Limiter and Custom URL using Redis.
 
 ### Built With
 
-* [![Go][Go]][Go-url]
-* [![Redis][Redis]][Redis-url]
-* [![Docker][Docker]][Docker-url]
-* [![GoFiber][GoFiber]][GoFiber-url]
+* Go
+* Redis
+* Docker
+* GoFiber
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Prerequisites
 
 * Go
-* Docker-Compose
+* Docker Compose
 
 ### Installation
 
@@ -25,7 +25,7 @@ Demonstration of URL shortner with API Rate Limiter and Custom URL using Redis.
    ```
 2. Change Directory
    ```sh
-   cd ur-shortner-go
+   cd url-shortner-go
    ```
 3. 
    ```sh
