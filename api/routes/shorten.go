@@ -3,9 +3,14 @@ package routes
 import(
 	"time"
 	"os"
+	"strconv"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/sarmaasis/url-shortner-go/database"
+	"github.com/sarmaasis/url-shortner-go/helpers"
+	"github.com/go-redis/redis/v8"
+	"github.com/asaskevich/govalidator"
+	"github.com/google/uuid"
 )
 
 type request struct {
@@ -27,7 +32,7 @@ func ShortenURL(c * fiber.Ctx) error{
 	body := new(request)
 
 	if err := c.BodyParser(&body); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "cannot parse JSON"})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "cannot parse JSON",})
 	}
 
 	/*
@@ -39,9 +44,8 @@ func ShortenURL(c * fiber.Ctx) error{
 
 	value, err := r2.Get(database.Ctx, c.IP()).Result()
 	if err == redis.Nil{
-		_ = r2.Set(database.Ctx, c.IP, os.Getenv("API_QUOTA"), 30*60*time.Second).Err()
+		_ = r2.Set(database.Ctx, c.IP(), os.Getenv("API_QUOTA"), 30*60*time.Second).Err()
 	} else {
-		value, _ := r2.Get(database.Ctx, c.IP()).Result()
 		valueInt, _ = strconv.Atoi(value)
 
 		if valueInt < = 0 {
@@ -59,7 +63,7 @@ func ShortenURL(c * fiber.Ctx) error{
 	*/
 	
 	if !govalidator.IsURL(body.URL){
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid URL"})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid URL",})
 	}
 
 
@@ -68,7 +72,7 @@ func ShortenURL(c * fiber.Ctx) error{
 	*/
 
 	if !helpers.RemoveDomainError(body.URL){
-		return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{"error": ""})
+		return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{"error": "",})
 	}
 
 
@@ -106,12 +110,29 @@ func ShortenURL(c * fiber.Ctx) error{
 
 	if err != nil {
 		return c.Status(fiber.StatusInernalServerError).JSON(fiber.Map{
-			"error": "unable to connect to server"
+			"error": "unable to connect to server",
 		})
 	}
 
+	resp := response{
+		URL:				body.URL,
+		CustomShort:		"",
+		Expiry:				body.Expiry,
+		XRateRemaining:		10,
+		XRateLimitReset:	30,
+	}
 
 
 	r2.Decr(database.Ctx, c.IP())
+
+	val, _ := r2.Get(database.Ctx, c.IP()).Result()
+	resp.XRateRemaining, _ = strconv.Atoi(val)
+
+	ttl, _ := re.TTL(database.Ctx, c.IP()).Result()
+	resp.XRateLimitReset = ttl/time.Nanosecond/time.Minute
+
+	resp.CustomShort = os.Getenv("DOMAIN") + "/" + id
+
+	return c.Status(fiber.StatusOk).JSON(resp)
 	
 }
